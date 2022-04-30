@@ -139,4 +139,5 @@ class ASRMGAA(Attacker):
         batch.sig = save_input, batch.sig[1]
         batch = batch.to(save_device)
         self.asr_brain.module_eval()
+        print("MGAA")
         return (save_input + delta).data.to(save_device)

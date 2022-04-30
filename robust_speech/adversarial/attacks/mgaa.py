@@ -119,6 +119,7 @@ class ASRMGAA(Attacker):
             batch.sig = wav_init + delta, batch.sig[1]
             train_adv = self.nested_attack.perturb(batch)
             batch.sig = wav_init, batch.sig[1]
+
             test_adv = pgd_loop(
                 batch,
                 self.asr_brain,
@@ -129,10 +130,11 @@ class ASRMGAA(Attacker):
                 order=self.order,
                 clip_min=self.clip_min,
                 clip_max=self.clip_max,
-                delta_init=nn.Parameter(train_adv - x),
+                delta_init=nn.Parameter(
+                    train_adv - batch.sig[0]),  # rem to put x
                 l1_sparsity=False,
             )
-            delta = test_adv - train_adv
+            delta = (test_adv - train_adv).detach()
 
         batch.sig = save_input, batch.sig[1]
         batch = batch.to(save_device)
